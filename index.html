@@ -1,89 +1,221 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
+  <!-- when using the mode "code", it's important to specify charset utf-8 -->
   <meta charset="utf-8">
 
-  <title>JSONEditor | New window</title>
+  <title>JSONEditor | Switch mode</title>
 
   <link href="../dist/jsoneditor.css" rel="stylesheet" type="text/css">
   <script src="../dist/jsoneditor.js"></script>
 
   <style type="text/css">
+    body {
+      font: 10.5pt arial;
+      color: #4d4d4d;
+      line-height: 150%;
+    }
+
+    code {
+      background-color: #f5f5f5;
+    }
+
     #jsoneditor {
-      width: 500px;
+      width: 980px;
       height: 500px;
+    }
+    .example {
+      max-width: 980px;
+      margin: auto;
+    }
+    .test-list {
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
+<div class="example">
+  <H1>Example of JSON Editor</H1>
 <p>
-  <button id="openNewEditor">Open Editor in New Window</button>
-  <button id="setJSON">Set JSON</button>
-  <button id="getJSON">Get JSON</button>
+  Documentation can be found <a href="https://github.com/josdejong/jsoneditor/blob/master/docs/api.md">here</a>
 </p>
 
+  <p>Example schema from <b>Offering Card - Debt</b></p>
+
+<div id="jsoneditor"></div>
+
+  <h2>Another examples of features</h2>
+  <ul class="test-list">
+    <li><a href="examples/01_basic_usage.html">JSONEditor | Basic usage</a></li>
+    <li><a href="examples/02_viewer.html">This editor is read-only (mode='viewer').</a></li>
+    <li><a href="examples/03_switch_mode.html">Switch editor mode using the mode box.</a></li>
+    <li><a href="examples/04_load_and_save.html">Load and save JSON documents</a></li>
+    <li><a href="examples/05_custom_fields_editable.html">Custom editable fields</a></li>
+    <li><a href="examples/06_custom_styling.html">Custom styling</a></li>
+    <li><a href="examples/07_json_schema_validation.html">JSON schema validation</a></li>
+    <li><a href="examples/08_custom_ace.html">Custom Ace</a></li>
+    <li><a href="examples/09_readonly_text_mode.html">Switch mode</a></li>
+    <li><a href="examples/10_templates.html">Item templates</a></li>
+    <li><a href="examples/11_autocomplete_basic.html">Auto Complete</a></li>
+    <li><a href="examples/12_autocomplete_dynamic.html">Dynamic Auto Complete</a></li>
+    <li><a href="examples/13_autocomplete_advanced.html">Advanced Auto Complete</a></li>
+    <li><a href="examples/14_translate.html">Translate</a></li>
+    <li><a href="examples/15_selection_api.html">Selection indication</a></li>
+    <li><a href="examples/16_synchronize_editors.html">Synchronize two editors</a></li>
+    <li><a href="examples/17_on_event_api.html">Event API</a></li>
+    <li><a href="examples/18_custom_validation.html">Custom validation</a></li>
+    <li><a href="examples/19_custom_validation_async.html">Custom validation (asynchronous)</a></li>
+    <li><a href="examples/20_custom_css_style_for_nodes.html">Custom class names</a></li>
+    <li><a href="examples/21_customize_context_menu.html">Context Menu Customization</a></li>
+    <li><a href="examples/22_on_validation_event.html">Validation on Event</a></li>
+    <li><a href="examples/23_custom_query_language.html">Custom query language</a></li>
+    <li><a href="examples/24_new_window.html">New window</a></li>
+    <li><a href="examples/25_sync_node_expand.html">Sync Node Expand</a></li>
+    <li><a href="examples/26_autocomplete_by_schema.html">Auto-completion by schema</a></li>
+    <li><a href="examples/27_autocomplete_by_schema_recursive_refs.html">Auto-completion by schema</a></li>
+  </ul>
+</div>
 <script>
-  let editor
+  const container = document.getElementById('jsoneditor')
 
-  function openNewEditor() {
-    const child = window.open("", "_blank", "width=400,height=400")
-    child.document.title = 'JSONEditor | New window'
-    child.onunload = function () {
-      editor = undefined
-    }
-
-    // make the necessary styles available within the child window
-    // for JSONEditor
-    const baseUrl = window.location.href.slice(0, window.location.href.lastIndexOf('/'))
-    const jsonEditorStyles = child.document.createElement("link")
-    jsonEditorStyles.setAttribute("href", baseUrl + "/../dist/jsoneditor.css")
-    jsonEditorStyles.setAttribute("rel", "stylesheet")
-    child.document.head.append(jsonEditorStyles)
-    // for vanilla-picker
-    const colorPickerStyles = JSONEditor.VanillaPicker.StyleElement.cloneNode(true)
-    child.document.head.append(colorPickerStyles)
-
-    const container = child.document.createElement("div")
-    child.document.body.append(container)
-
-    // create the editor
-    const options = {
-      // Show sort and transform modals in the child window, not the parent.
-      modalAnchor: child.document.body
-    }
-    editor = new JSONEditor(container, options)
-  }
-
-  // create a new window
-  document.getElementById('openNewEditor').onclick = openNewEditor
-
-  // set json
-  document.getElementById('setJSON').onclick = function () {
-    if (!editor) {
-      openNewEditor()
-    }
-    const json = {
-      'array': [1, 2, 3],
-      'boolean': true,
-      'color': '#82b92c',
-      'null': null,
-      'number': 123,
-      'object': {'a': 'b', 'c': 'd'},
-      'time': 1575599819000,
-      'string': 'Hello World'
-    }
-    editor.set(json)
-  }
-
-  // get json
-  document.getElementById('getJSON').onclick = function () {
-    if (!editor) {
-      alert('No editor is open')
-    } else {
-      const json = editor.get()
-      alert(JSON.stringify(json, null, 2))
+  const options = {
+    mode: 'code',
+    modes: ['code', 'form', 'text', 'tree', 'view', 'preview'], // allowed modes
+    onModeChange: function (newMode, oldMode) {
+      console.log('Mode switched from', oldMode, 'to', newMode)
     }
   }
+
+  const json = {
+    "type": "route.name_view",
+    "capital_type": "debt",
+    "data": [
+      {
+        "type": "image",
+        "visibility": "public"
+      },
+      {
+        "type": "labels_capital_type",
+        "visibility": "public"
+      },
+      {
+        "type": "labels_offering_status",
+        "visibility": "public"
+      },
+      {
+        "type": "labels_regulation_type",
+        "visibility": "public"
+      },
+      {
+        "type": "controls_offering_follow",
+        "visibility": "public"
+      },
+      {
+        "type": "organization_name",
+        "visibility": "public"
+      },
+      {
+        "type": "organization_logo",
+        "visibility": "public"
+      },
+      {
+        "type": "tags",
+        "visibility": "public"
+      },
+      {
+        "type": "title",
+        "visibility": "public"
+      },
+      {
+        "type": "description",
+        "visibility": "public"
+      },
+      {
+        "type": "close_date",
+        "visibility": "public"
+      },
+      {
+        "type": "time_left",
+        "visibility": "public"
+      },
+      {
+        "type": "progress_percentage",
+        "visibility": "public"
+      },
+      {
+        "type": "progress_part",
+        "visibility": "public"
+      },
+      {
+        "type": "progress_total",
+        "visibility": "public"
+      },
+      {
+        "type": "address",
+        "visibility": "public"
+      },
+      {
+        "type": "downloads_agreement",
+        "visibility": "public"
+      },
+      {
+        "type": "details",
+        "title": {
+          "en": "Funding goal"
+        },
+        "field": "offering.fundingGoal.formatted",
+        "visibility": "public"
+      },
+      {
+        "type": "details",
+        "title": {
+          "en": "Interest Rate"
+        },
+        "field": "offering.interestRate",
+        "format": {
+          "en": "$value %"
+        },
+        "visibility": "public"
+      },
+      {
+        "type": "details",
+        "title": {
+          "en": "Minimum investment"
+        },
+        "field": "offering.minCommitment.formatted",
+        "visibility": "public"
+      },
+      {
+        "type": "details",
+        "title": {
+          "en": "Term"
+        },
+        "field": "offering.term",
+        "format": {
+          "en": "$value months|$value month|$value months"
+        },
+        "visibility": "public"
+      },
+      {
+        "type": "details",
+        "title": {
+          "en": "Number of interests"
+        },
+        "field": "offering.indicatedInterestsNumber",
+        "visibility": "public"
+      },
+      {
+        "type": "details",
+        "title": {
+          "en": "Indicated interest"
+        },
+        "field": "offering.indicatedInterestsAmount.formatted",
+        "visibility": "public"
+      }
+    ]
+  }
+
+  const editor = new JSONEditor(container, options, json)
 </script>
 </body>
 </html>
